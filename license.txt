@@ -1,0 +1,3 @@
+WTFPL
+
+Admin Pickaxe code from maptools mod by Calinou, the code has been altered.
