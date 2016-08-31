@@ -20,6 +20,19 @@ minetest.register_tool("server_helper:admin_pick", {
   },
 })
 
+minetest.register_on_chat_message(function(name,message)
+  if string.match(message, "%u%u%u%u") then
+    minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
+  end
+end)
+
+minetest.register_on_chat_message(function(name,message)
+  privs = {server = true}
+  if message == "restart" then
+    minetest.request_shutdown("Sorry, I am just restarting upon request.")
+  end
+end)
+
 -- These watch for certain keywords or phrases and make a response.
 minetest.register_on_chat_message(function(name,message)
   if string.match(message, "grief" or "griefing" or "griefed") then
