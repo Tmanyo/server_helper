@@ -20,16 +20,33 @@ minetest.register_tool("server_helper:admin_pick", {
   },
 })
 
+local a = 1
 minetest.register_on_chat_message(function(name,message)
-  if string.match(message, "%u%u%u%u") then
-    minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
-  end
+    if string.match(message, "%u%u%u%u") then
+      a = a + 1
+      if a < 6 then
+        minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
+      elseif a >= 6 then
+        minetest.kick_player(name, "You were told to stop and you didn't.")
+        a = 0
+      end
+    end
 end)
 
 minetest.register_on_chat_message(function(name,message)
-  privs = {server = true}
-  if message == "restart" then
-    minetest.request_shutdown("Sorry, I am just restarting upon request.")
+  if message == "Hi" or message == "hi" or message == "hello" or message == "Hello" or message == "Hola" or message == "hola" or message == "howdy" or message == "Howdy" or message == "Hoy" or message == "hoy" then
+    minetest.chat_send_all("<The All Seeing Eye> Hello "..name..".")
+  end
+end)
+
+local myname = "The All Seeing Eye"
+local myname2 = "the all seeing eye"
+minetest.register_on_chat_message(function(name,message)
+  if string.match(message, myname) then
+    minetest.chat_send_all("<The All Seeing Eye> What do you need?")
+  end
+  if string.match(message, myname2) then
+    minetest.chat_send_all("<The All Seeing Eye> What do you need?")
   end
 end)
 
