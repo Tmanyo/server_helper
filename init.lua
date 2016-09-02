@@ -33,6 +33,26 @@ minetest.register_on_chat_message(function(name,message)
     end
 end)
 
+local question = 1
+minetest.register_on_dieplayer(function(player)
+  minetest.chat_send_player(player:get_player_name(),"Would you like me to teleport you to your bones?")
+    question = 1
+    minetest.register_on_chat_message(function(name,message)
+      if message == "no" and question == 1 then
+          minetest.chat_send_player(name, "Ok.")
+          question = 0
+      elseif message == "yes" then
+        if question == 1 then
+          local pos = vector.round(player:getpos())
+          local playername = minetest.get_player_name(player)
+          playername:setpos(pos)
+          minetest.chat_send_player(name, "There you are!")
+          question = 0
+        end
+      end
+    end)
+end)
+
 minetest.register_on_chat_message(function(name,message)
   if message == "Hi" or message == "hi" or message == "hello" or message == "Hello" or message == "Hola" or message == "hola" or message == "howdy" or message == "Howdy" or message == "Hoy" or message == "hoy" then
     minetest.chat_send_all("<The All Seeing Eye> Hello "..name..".")
