@@ -1,25 +1,4 @@
--- Code for the admin_pick from maptools by Calinou, has been altered.
-minetest.register_tool("server_helper:admin_pick", {
-  description = "Admin Pick",
-  groups = {not_in_creative_inventory = 1},
-  range = 15,
-  inventory_image = "admin_pick.png",
-  tool_capabilities = {
-    full_punch_interval = .001,
-    max_drop_level = 3,
-    groupcaps = {
-		  unbreakable = {times={[1] = 0, [2] = 0, [3] = 0}, uses = 0, maxlevel = 3},
-			fleshy =      {times={[1] = 0, [2] = 0, [3] = 0}, uses = 0, maxlevel = 3},
-			choppy =      {times={[1] = 0, [2] = 0, [3] = 0}, uses = 0, maxlevel = 3},
-			bendy =       {times={[1] = 0, [2] = 0, [3] = 0}, uses = 0, maxlevel = 3},
-			cracky =      {times={[1] = 0, [2] = 0, [3] = 0}, uses = 0, maxlevel = 3},
-			crumbly =     {times={[1] = 0, [2] = 0, [3] = 0}, uses = 0, maxlevel = 3},
-			snappy =      {times={[1] = 0, [2] = 0, [3] = 0}, uses = 0, maxlevel = 3},
-		},
-    damage_groups = {fleshy = 1000},
-  },
-})
-
+-- This watches for all caps usage and warns 4 times and kicks on the 5th.
 local a = 1
 minetest.register_on_chat_message(function(name,message)
     if string.match(message, "%u%u%u%u") then
@@ -33,20 +12,21 @@ minetest.register_on_chat_message(function(name,message)
     end
 end)
 
+-- If you die in singleplayer you are given an option to teleport to your bones.
 local question = 1
 minetest.register_on_dieplayer(function(player)
-  minetest.chat_send_player(player:get_player_name(),"Would you like me to teleport you to your bones?")
+  local pos = vector.round(player:getpos())
+  minetest.chat_send_player(player:get_player_name(),"<The All Seeing Eye> Would you like me to teleport you to your bones?")
     question = 1
     minetest.register_on_chat_message(function(name,message)
       if message == "no" and question == 1 then
-          minetest.chat_send_player(name, "Ok.")
+          minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
           question = 0
       elseif message == "yes" then
         if question == 1 then
-          local pos = vector.round(player:getpos())
-          local playername = minetest.get_player_name(player)
-          playername:setpos(pos)
-          minetest.chat_send_player(name, "There you are!")
+          local playername = player:get_player_name(player)
+          player:setpos(pos)
+          minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
           question = 0
         end
       end
