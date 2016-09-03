@@ -12,6 +12,30 @@ minetest.register_on_chat_message(function(name,message)
     end
 end)
 
+-- This will ask you if you want to teleport to spawn if you are stuck.
+-- Note: Only works if there is a static_spawnpoint set in the minetest.conf
+local respawn = 1
+minetest.register_on_chat_message(function(name,message)
+  if message == "I am stuck." or message == "I'm stuck." or message == "im stuck" or message == "Help I am stuck." or message == "help i am stuck" or message == "help stuck" or message == "help im stuck" then
+    minetest.chat_send_player(name, "<The All Seeing Eye> Would you like me to teleport you to spawn?")
+      respawn = 1
+      minetest.register_on_chat_message(function(name,message)
+        if message == "no" and respawn == 1 then
+          minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
+          respawn = 0
+        elseif message == "yes" then
+          if respawn == 1 then
+            local pos = minetest.setting_get_pos("static_spawnpoint")
+            local player = minetest.get_player_by_name(name)
+            player:setpos(pos)
+            minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
+            respawn = 0
+          end
+        end
+      end)
+    end
+end)
+
 -- If you die in singleplayer you are given an option to teleport to your bones.
 local question = 1
 minetest.register_on_dieplayer(function(player)
