@@ -1,13 +1,17 @@
+dofile(minetest.get_modpath("server_helper").."/config.lua")
+
 -- This watches for all caps usage and warns 4 times and kicks on the 5th.
 local a = 1
 minetest.register_on_chat_message(function(name,message)
     if string.match(message, "%u%u%u%u") then
+      if minetest.setting_getbool("cap_usage") == true then
       a = a + 1
-      if a < 6 then
-        minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
-      elseif a >= 6 then
-        minetest.kick_player(name, "You were told to stop and you didn't.")
-        a = 0
+        if a < 6 then
+          minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
+        elseif a >= 6 then
+          minetest.kick_player(name, "You were told to stop and you didn't.")
+          a = 0
+        end
       end
     end
 end)
@@ -16,7 +20,8 @@ end)
 -- Note: Only works if there is a static_spawnpoint set in the minetest.conf
 local respawn = 1
 minetest.register_on_chat_message(function(name,message)
-  if message == "I am stuck." or message == "I'm stuck." or message == "im stuck" or message == "Help I am stuck." or message == "help i am stuck" or message == "help stuck" or message == "help im stuck" then
+  if message == "I am stuck." or message == "I'm stuck." or message == "im stuck" or message == "Help I am stuck." or
+  message == "help i am stuck" or message == "help stuck" or message == "help im stuck" then
     minetest.chat_send_player(name, "<The All Seeing Eye> Would you like me to teleport you to spawn?")
       respawn = 1
       minetest.register_on_chat_message(function(name,message)
@@ -58,7 +63,9 @@ minetest.register_on_dieplayer(function(player)
 end)
 
 minetest.register_on_chat_message(function(name,message)
-  if message == "Hi" or message == "hi" or message == "hello" or message == "Hello" or message == "Hola" or message == "hola" or message == "howdy" or message == "Howdy" or message == "Hoy" or message == "hoy" then
+  if message == "Hi" or message == "hi" or message == "hello" or message == "Hello" or
+  message == "Hola" or message == "hola" or message == "howdy" or message == "Howdy" or
+  message == "Hoy" or message == "hoy" then
     minetest.chat_send_all("<The All Seeing Eye> Hello "..name..".")
   end
 end)
@@ -81,9 +88,31 @@ minetest.register_on_chat_message(function(name,message)
   end
 end)
 
+local chance = 1
+minetest.register_on_chat_message(function(name, message)
+  if string.match(message, "fuck") or string.match(message, "Fuck") or string.match(message, "Shit") or
+  string.match(message, "shit") or string.match(message, "ass") or string.match(message, "Ass") or
+  string.match(message, "bitch") or string.match(message, "Bitch") or string.match(message, "Cunt") or
+  string.match(message, "cunt") or string.match(message, "Dick") or string.match(message, "dick") or
+  string.match(message, "Fucker") or string.match(message, "fucker") or string.match(message, "damn") or
+  string.match(message, "Damn") then
+    if minetest.setting_getbool("language_control") == true then
+      chance = chance + 1
+      if chance < 6 then
+        minetest.chat_send_all("<The All Seeing Eye> Please do not use foul language.")
+      elseif chance >= 6 then
+        minetest.kick_player(name, "You didn't stop using foul language!")
+        chance = 0
+      end
+    end
+  end
+end)
+
 minetest.register_on_chat_message(function(name,message)
   if string.match(message, "cussing") or string.match(message, "cursing") or string.match(message, "bad word") then
-    minetest.chat_send_all("<The All Seeing Eye> Bad language is not acceptable.")
+    if minetest.setting_getbool("language_control") == true then
+      minetest.chat_send_all("<The All Seeing Eye> Bad language is not acceptable.")
+    end
   end
 end)
 
