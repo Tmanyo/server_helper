@@ -1,5 +1,19 @@
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
+minetest.register_on_chat_message(function(name,message)
+  if minetest.setting_getbool("time_change") == true then
+    if message == "can we have day" or message == "can we have day?" or message == "Can we have day?" or message == "day?" or
+    message == "Day?" or message == "day please" or message == "please have day" then
+      minetest.set_timeofday(.4)
+      minetest.chat_send_all("<The All Seeing Eye> It is now day!")
+    elseif message == "can we have night" or message == "can we have night?" or message == "Can we have night?" or message == "night?" or
+    message == "Night?" or message == "night please" or message == "please have night" then
+      minetest.set_timeofday(0)
+      minetest.chat_send_all("<The All Seeing Eye> It is now night!")
+    end
+  end
+end)
+
 -- This watches for all caps usage and warns 4 times and kicks on the 5th.
 local a = 1
 minetest.register_on_chat_message(function(name,message)
@@ -14,6 +28,30 @@ minetest.register_on_chat_message(function(name,message)
         end
       end
     end
+end)
+
+local b = 1
+minetest.register_on_chat_message(function(name,message)
+  if string.match(message, "help") or string.match(message, "Help") or string.match(message, "I need help.") or
+  string.match(message, "i need help") then
+    minetest.chat_send_player(name, "<The All Seeing Eye> What do you need help with?")
+      b = 1
+      minetest.register_on_chat_message(function(name,message)
+        if message == "how do i set home" or message == "How do I set home" or message == "How do I set home?" or
+        message == "how do i set home?" or message == "set home?" or message == "how to set home?" or message == "how to set home" and b == 1 then
+          minetest.chat_send_player(name, "<The All Seeing Eye> If you have the home priv, you can set home by going to the location where you would like to set home and type /sethome.")
+          b = 0
+        elseif string.match(message, "ip") or string.match(message, "ip?") or string.match(message, "IP") or string.match(message, "IP?") or
+        string.match(message, "what is my ip") or string.match(message, "what is my ip?") or string.match(message, "What is my ip?") or
+        string.match(message, "What is my IP") or string.match(message, "What is my IP?") or string.match(message, "my ip") or string.match(message, "my ip?") or
+        string.match(message, "My IP") or string.match(message, "My IP?") then
+          if b == 1 then
+            minetest.chat_send_player(name, "<The All Seeing Eye> " ..minetest.get_player_ip(name))
+            b = 0
+          end
+        end
+      end)
+  end
 end)
 
 -- This will ask you if you want to teleport to spawn if you are stuck.
