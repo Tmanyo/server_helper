@@ -1,5 +1,32 @@
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
+minetest.register_node("server_helper:the_eye", {
+  description = "The All Seeing Eye",
+  tiles = "the_eye.png",
+  groups = {cracky=3, oddly_breakable_by_hand=2},
+  on_rightclick = function(pos,node)
+    minetest.swap_node(pos, {name = "server_helper:the_eye_on"})
+  end
+})
+
+minetest.register_node("server_helper:the_eye_on", {
+  description = "The All Seeing Eye",
+  tiles = "the_eye_on.png",
+  groups = {not_in_creative_inventory=1, cracky=3, oddly_breakable_by_hand=2},
+  on_rightclick = function(pos,node)
+    minetest.swap_node(pos, {name = "server_helper:the_eye"})
+  end
+})
+
+minetest.register_on_chat_message(function(name,message)
+  if minetest.setting_getbool("punctuation_control") == true then
+    if string.match(message, "%p%p%p%p%p%p") then
+      minetest.chat_send_all("<The All Seeing Eye> Please do not go over-board with punctuation.")
+    end
+  end
+end)
+
+-- Can be turned on and off using the time_change setting in config.lua.
 minetest.register_on_chat_message(function(name,message)
   if minetest.setting_getbool("time_change") == true then
     if message == "can we have day" or message == "can we have day?" or message == "Can we have day?" or message == "day?" or
@@ -17,7 +44,8 @@ end)
 -- This watches for all caps usage and warns 4 times and kicks on the 5th.
 local a = 1
 minetest.register_on_chat_message(function(name,message)
-    if string.match(message, "%u%u%u%u") then
+    if string.match(message, "%u%u%u%u") or string.match(message, "%u%u%u %u") or string.match(message, "%u %u%u%u") or
+    string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
       if minetest.setting_getbool("cap_usage") == true then
       a = a + 1
         if a < 6 then
@@ -30,6 +58,7 @@ minetest.register_on_chat_message(function(name,message)
     end
 end)
 
+local you = "u"
 local b = 1
 minetest.register_on_chat_message(function(name,message)
   if string.match(message, "help") or string.match(message, "Help") or string.match(message, "I need help.") or
@@ -47,6 +76,12 @@ minetest.register_on_chat_message(function(name,message)
         string.match(message, "My IP") or string.match(message, "My IP?") then
           if b == 1 then
             minetest.chat_send_player(name, "<The All Seeing Eye> " ..minetest.get_player_ip(name))
+            b = 0
+          end
+        elseif string.match(message, "how to protect using areas") or string.match(message, "How to protect using areas?") or string.match(message, "how do"..you.." protect using areas") or string.match(message, "how do"..you.." protect using areas?") or
+        string.match(message, "how do "..you.." use areas?") or string.match(message, "How do"..you.." use areas?") or string.match(message, "help protecting") then
+          if b == 1 then
+            minetest.chat_send_player(name, "<The All Seeing Eye> You can potect a build by typing /area_pos set and setting 2 diagonal positions on the x,y,z axis.  Then you can use /protect (area name) to finish.")
             b = 0
           end
         end
@@ -147,7 +182,7 @@ minetest.register_on_chat_message(function(name, message)
 end)
 
 minetest.register_on_chat_message(function(name,message)
-  if string.match(message, "cussing") or string.match(message, "cursing") or string.match(message, "bad word") then
+  if string.match(message, "cussing") or string.match(message, "cursing") or string.match(message, "bad word") or string.match(message, "swearing") then
     if minetest.setting_getbool("language_control") == true then
       minetest.chat_send_all("<The All Seeing Eye> Bad language is not acceptable.")
     end
