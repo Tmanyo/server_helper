@@ -1,23 +1,5 @@
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
-minetest.register_node("server_helper:the_eye", {
-  description = "The All Seeing Eye",
-  tiles = "the_eye.png",
-  groups = {cracky=3, oddly_breakable_by_hand=2},
-  on_rightclick = function(pos,node)
-    minetest.swap_node(pos, {name = "server_helper:the_eye_on"})
-  end
-})
-
-minetest.register_node("server_helper:the_eye_on", {
-  description = "The All Seeing Eye",
-  tiles = "the_eye_on.png",
-  groups = {not_in_creative_inventory=1, cracky=3, oddly_breakable_by_hand=2},
-  on_rightclick = function(pos,node)
-    minetest.swap_node(pos, {name = "server_helper:the_eye"})
-  end
-})
-
 minetest.register_on_chat_message(function(name,message)
   if minetest.setting_getbool("punctuation_control") == true then
     if string.match(message, "%p%p%p%p%p%p") then
