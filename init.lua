@@ -23,13 +23,21 @@ minetest.register_on_chat_message(function(name,message)
   end
 end)
 
+local playername = minetest.get_player_by_name(name)
+player_cap_usage = {playername = a}
+minetest.register_on_joinplayer(function(player)
+  player_cap_usage.playername = 0
+end)
+
 -- This watches for all caps usage and warns 4 times and kicks on the 5th.
-local a = 1
 minetest.register_on_chat_message(function(name,message)
-    if string.match(message, "%u%u%u%u") or string.match(message, "%u%u%u %u") or string.match(message, "%u %u%u%u") or
-    string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
-      if minetest.setting_getbool("cap_usage") == true then
+  if string.match(message, "%u%u%u%u") or string.match(message, "%u%u%u %u") or string.match(message, "%u %u%u%u") or
+  string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
+    if minetest.setting_getbool("cap_usage") == true then
+      local a = player_cap_usage.playername
       a = a + 1
+      player_cap_usage.playername = a
+      if player_cap_usage then
         if a < 6 then
           minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
         elseif a >= 6 then
@@ -38,6 +46,7 @@ minetest.register_on_chat_message(function(name,message)
         end
       end
     end
+  end
 end)
 
 local you = "u"
