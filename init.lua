@@ -35,17 +35,18 @@ end)
 
 -- This watches for all caps usage and warns 4 times and kicks on the 5th.
 minetest.register_on_chat_message(function(name,message)
-  if string.match(message, "%u%u%u%u") or string.match(message, "%u%u%u %u") or string.match(message, "%u %u%u%u") or
-  string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
-    if minetest.setting_getbool("cap_usage") == true then
+  if minetest.setting_getbool("cap_usage") == true then
+    if string.match(message, "%u%u%u%u") or string.match(message, "%u%u%u %u") or string.match(message, "%u %u%u%u") or
+    string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
       local a = server_helper.players[name].shout
-		a = a + 1
-		print (name..' used caps '..a..' times.')
-        server_helper.players[name] = {shout = a,}
-        if a < 5 then
-          minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
-        elseif a >= 5 then
-          minetest.kick_player(name, "You were told to stop and you didn't.")
+		  a = a + 1
+		  print (name..' used caps '..a..' times.')
+      server_helper.players[name] = {shout = a,}
+      if a < 5 then
+        minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
+      elseif a >= 5 then
+        minetest.kick_player(name, "You were told to stop and you didn't.")
+        minetest.chat_send_all(name .. " was just kicked for excessive cap usage.")
       end
     end
   end
