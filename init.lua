@@ -1,3 +1,6 @@
+server_helper = {
+players = {}
+}
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
 minetest.register_on_chat_message(function(name,message)
@@ -23,10 +26,11 @@ minetest.register_on_chat_message(function(name,message)
   end
 end)
 
-local playername = minetest.get_player_by_name(name)
-player_cap_usage = {playername = a}
 minetest.register_on_joinplayer(function(player)
-  player_cap_usage.playername = 0
+	local name = player:get_player_name()
+	print ('this player just joined, '..name)
+    server_helper.players[name] = {shout = 0,}
+	local a = server_helper.players[name].shout
 end)
 
 -- This watches for all caps usage and warns 4 times and kicks on the 5th.
@@ -34,16 +38,14 @@ minetest.register_on_chat_message(function(name,message)
   if string.match(message, "%u%u%u%u") or string.match(message, "%u%u%u %u") or string.match(message, "%u %u%u%u") or
   string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
     if minetest.setting_getbool("cap_usage") == true then
-      local a = player_cap_usage.playername
-      a = a + 1
-      player_cap_usage.playername = a
-      if player_cap_usage then
-        if a < 6 then
+      local a = server_helper.players[name].shout
+		a = a + 1
+		print (name..' used caps '..a..' times.')
+        server_helper.players[name] = {shout = a,}
+        if a < 5 then
           minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
-        elseif a >= 6 then
+        elseif a >= 5 then
           minetest.kick_player(name, "You were told to stop and you didn't.")
-          a = 0
-        end
       end
     end
   end
