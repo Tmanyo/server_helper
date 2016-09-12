@@ -1,6 +1,7 @@
 server_helper = {
 players = {}
 }
+
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
 minetest.register_on_chat_message(function(name,message)
@@ -40,7 +41,6 @@ minetest.register_on_chat_message(function(name,message)
     string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
       local a = server_helper.players[name].shout
 		  a = a + 1
-		  print (name..' used caps '..a..' times.')
       server_helper.players[name] = {shout = a,}
       if a < 5 then
         minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
@@ -155,21 +155,28 @@ minetest.register_on_chat_message(function(name,message)
   end
 end)
 
-local chance = 1
+minetest.register_on_joinplayer(function(player)
+	local name = player:get_player_name()
+	print ('this player just joined, '..name)
+    server_helper.players[name] = {shout = 0,}
+	local chance = server_helper.players[name].shout
+end)
+
 minetest.register_on_chat_message(function(name, message)
-  if string.match(message, "fuck") or string.match(message, "Fuck") or string.match(message, "Shit") or
-  string.match(message, "shit") or string.match(message, "ass") or string.match(message, "Ass") or
-  string.match(message, "bitch") or string.match(message, "Bitch") or string.match(message, "Cunt") or
-  string.match(message, "cunt") or string.match(message, "Dick") or string.match(message, "dick") or
-  string.match(message, "Fucker") or string.match(message, "fucker") or string.match(message, "damn") or
-  string.match(message, "Damn") then
-    if minetest.setting_getbool("language_control") == true then
+  if minetest.setting_getbool("language_control") == true then
+    if string.match(message, "fuck") or string.match(message, "Fuck") or string.match(message, "Shit") or
+    string.match(message, "shit") or string.match(message, "ass") or string.match(message, "Ass") or
+    string.match(message, "bitch") or string.match(message, "Bitch") or string.match(message, "Cunt") or
+    string.match(message, "cunt") or string.match(message, "Dick") or string.match(message, "dick") or
+    string.match(message, "Fucker") or string.match(message, "fucker") or string.match(message, "damn") or
+    string.match(message, "Damn") then
+      local chance = server_helper.players[name].shout
       chance = chance + 1
-      if chance < 6 then
+      server_helper.players[name] = {shout = chance,}
+      if chance < 5 then
         minetest.chat_send_all("<The All Seeing Eye> Please do not use foul language.")
-      elseif chance >= 6 then
+      elseif chance >= 5 then
         minetest.kick_player(name, "You didn't stop using foul language!")
-        chance = 0
       end
     end
   end
