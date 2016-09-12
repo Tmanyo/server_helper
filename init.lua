@@ -29,7 +29,6 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
-	print ('this player just joined, '..name)
     server_helper.players[name] = {shout = 0,}
 	local a = server_helper.players[name].shout
 end)
@@ -46,7 +45,7 @@ minetest.register_on_chat_message(function(name,message)
         minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
       elseif a >= 5 then
         minetest.kick_player(name, "You were told to stop and you didn't.")
-        minetest.chat_send_all(name .. " was just kicked for excessive cap usage.")
+        minetest.chat_send_all(name .. " was just kicked for not following the rules.")
       end
     end
   end
@@ -155,13 +154,6 @@ minetest.register_on_chat_message(function(name,message)
   end
 end)
 
-minetest.register_on_joinplayer(function(player)
-	local name = player:get_player_name()
-	print ('this player just joined, '..name)
-    server_helper.players[name] = {shout = 0,}
-	local chance = server_helper.players[name].shout
-end)
-
 minetest.register_on_chat_message(function(name, message)
   if minetest.setting_getbool("language_control") == true then
     if string.match(message, "fuck") or string.match(message, "Fuck") or string.match(message, "Shit") or
@@ -170,13 +162,14 @@ minetest.register_on_chat_message(function(name, message)
     string.match(message, "cunt") or string.match(message, "Dick") or string.match(message, "dick") or
     string.match(message, "Fucker") or string.match(message, "fucker") or string.match(message, "damn") or
     string.match(message, "Damn") then
-      local chance = server_helper.players[name].shout
-      chance = chance + 1
-      server_helper.players[name] = {shout = chance,}
-      if chance < 5 then
+      local a = server_helper.players[name].shout
+      a = a + 1
+      server_helper.players[name] = {shout = a,}
+      if a < 5 then
         minetest.chat_send_all("<The All Seeing Eye> Please do not use foul language.")
-      elseif chance >= 5 then
+      elseif a >= 5 then
         minetest.kick_player(name, "You didn't stop using foul language!")
+        minetest.chat_send_all(name .. " was just kicked for not following the rules.")
       end
     end
   end
