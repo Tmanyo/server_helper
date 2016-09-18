@@ -91,10 +91,10 @@ minetest.register_on_chat_message(function(name,message)
     minetest.chat_send_player(name, "<The All Seeing Eye> Would you like me to teleport you to spawn?")
       respawn = 1
       minetest.register_on_chat_message(function(name,message)
-        if message == "no" and respawn == 1 then
+        if message == "no" or message == "No" and respawn == 1 then
           minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
           respawn = 0
-        elseif message == "yes" then
+        elseif message == "yes" or message == "Yes" then
           if respawn == 1 then
             local pos = minetest.setting_get_pos("static_spawnpoint")
             local player = minetest.get_player_by_name(name)
@@ -114,10 +114,10 @@ minetest.register_on_dieplayer(function(player)
   minetest.chat_send_player(player:get_player_name(),"<The All Seeing Eye> Would you like me to teleport you to your bones?")
     question = 1
     minetest.register_on_chat_message(function(name,message)
-      if message == "no" and question == 1 then
+      if message == "no"  or message == "No" and question == 1 then
           minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
           question = 0
-      elseif message == "yes" then
+      elseif message == "yes" or message == "Yes" then
         if question == 1 then
           local playername = player:get_player_name(player)
           player:setpos(pos)
@@ -212,3 +212,22 @@ minetest.register_on_chat_message(function(name,message)
     minetest.chat_send_all("<The All Seeing Eye> My favorite food is Chicken.")
   end
 end)
+
+minetest.register_chatcommand("people", {
+  func = function(name, param)
+		local people = ""
+		  for i, player in ipairs(minetest.get_connected_players()) do
+			  local name = player:get_player_name()
+			  if i < #minetest.get_connected_players() then
+				  people = people..name..", "
+			  else
+				  people = people..name
+			  end
+		  end
+    minetest.show_formspec(name, "server_helper:peeps",
+			"size[7,7]" ..
+			"label[0,0;Connected players:]" ..
+			"table[.5,.5;6,6;player_list;" .. people .."]"..
+			"button_exit[.5,6.5;2,1;exit;Close]")
+  end
+})
