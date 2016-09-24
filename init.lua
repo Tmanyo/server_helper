@@ -29,8 +29,8 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
-    server_helper.players[name] = {shout = 0,}
-	local a = server_helper.players[name].shout
+   server_helper.players[name] = {shout = 0,}
+   server_helper.players[name] = {location = 0,}
 end)
 
 -- This watches for all caps usage and warns 4 times and kicks on the 5th.
@@ -108,22 +108,33 @@ minetest.register_on_chat_message(function(name,message)
 end)
 
 -- If you die in singleplayer you are given an option to teleport to your bones.
-local question = 1
 minetest.register_on_dieplayer(function(player)
+  local name = player:get_player_name()
+  local dead_name = player:get_player_name()
   local pos = vector.round(player:getpos())
-  minetest.chat_send_player(player:get_player_name(),"<The All Seeing Eye> Would you like me to teleport you to your bones?")
+  local question = 0
+  server_helper.players[name].location = pos,
+  minetest.chat_send_player(player:get_player_name(),"<The All Seeing Eye> Would you like me to teleport you to your bones? (Yes/No)")
     question = 1
+    print (name)
+    print (dead_name)
     minetest.register_on_chat_message(function(name,message)
-      if message == "no"  or message == "No" and question == 1 then
-          minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
-          question = 0
+      print (name)
+      print (dead_name)
+      if message == "no"  or message == "No" then
+         if question == 1 and dead_name == name then
+         minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
+         question = 0
+         end
       elseif message == "yes" or message == "Yes" then
-        if question == 1 then
-          local playername = player:get_player_name(player)
-          player:setpos(pos)
-          minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
-          question = 0
-        end
+         if question == 1 and dead_name == name  then
+         local playername = player:get_player_name(player)
+         local pos = server_helper.players[name].location
+         player:setpos(pos)
+         minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
+         question = 0
+         end
+      else
       end
     end)
 end)
