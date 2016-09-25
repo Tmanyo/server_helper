@@ -4,20 +4,18 @@ players = {}
 
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
-risky_table = {
-  "gender",
-  "sex",
-  "male",
-  "female",
-  "location",
-  "u live",
-  "you live",
-  "girlfriend",
-  "boyfriend",
-}
+minetest.register_on_chat_message(function(name,message)
+  if message == "happy birthday" or message == "Happy Birthday" or message == "birthday"
+  or message == "Birthday" or message == "birthday?" or message == "Birthday?" or message == "birthday!" or
+  message == "Birthday!" then
+    minetest.chat_send_all("<The All Seeing Eye> Happy Birthday to you!\nHappy Birthday to you!\nHappy Birthday dear ".. name .."!\nHappy Birthday to you!")
+  end
+end)
 
 minetest.register_on_chat_message(function(name,message)
-  if risky_table then
+  if string.match(message, "gender") or string.match(message, "sex") or string.match(message, "male") or
+  string.match(message, "female") or string.match(message, "location") or string.match(message, "u live") or
+  string.match(message, "you live") or string.match(message, "girlfriend") or string.match(message, "boyfriend") then
     minetest.chat_send_all("<The All Seeing Eye> Maybe you shouldn't talk about that " .. name .. ".")
   end
 end)
