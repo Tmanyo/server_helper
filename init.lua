@@ -4,6 +4,24 @@ players = {}
 
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
+risky_table = {
+  "gender",
+  "sex",
+  "male",
+  "female",
+  "location",
+  "u live",
+  "you live",
+  "girlfriend",
+  "boyfriend",
+}
+
+minetest.register_on_chat_message(function(name,message)
+  if risky_table then
+    minetest.chat_send_all("<The All Seeing Eye> Maybe you shouldn't talk about that " .. name .. ".")
+  end
+end)
+
 minetest.register_on_chat_message(function(name,message)
   if minetest.setting_getbool("punctuation_control") == true then
     if string.match(message, "%p%p%p%p%p%p") then
