@@ -45,8 +45,7 @@ end)
 
 minetest.register_on_joinplayer(function(player)
 	local name = player:get_player_name()
-   server_helper.players[name] = {shout = 0,}
-   server_helper.players[name] = {location = 0,}
+   server_helper.players[name]= {shout = 0, location = 27,}
 end)
 
 -- This watches for all caps usage and warns 4 times and kicks on the 5th.
