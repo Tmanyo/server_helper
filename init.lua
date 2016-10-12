@@ -98,7 +98,6 @@ minetest.register_on_chat_message(function(name,message)
 end)
 
 -- This will ask you if you want to teleport to spawn if you are stuck.
--- Note: Only works if there is a static_spawnpoint set in the minetest.conf
 local respawn = 1
 minetest.register_on_chat_message(function(name,message)
   if message == "I am stuck." or message == "I'm stuck." or message == "im stuck" or message == "Help I am stuck." or
