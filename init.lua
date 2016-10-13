@@ -61,7 +61,7 @@ end)
 -- This will ask you if you want to teleport to spawn if you are stuck.
 local respawn = 1
 minetest.register_on_chat_message(function(name,message)
-     local player = server_helper.players[name].shout
+     local player = server_helper.players[name]
      if message == "I am stuck." or message == "I'm stuck." or message == "im stuck" or message == "Help I am stuck." or
      message == "help i am stuck" or message == "help stuck" or message == "help im stuck" then
           minetest.chat_send_player(name, "<The All Seeing Eye> Would you like me to teleport you to spawn?")
