@@ -5,123 +5,87 @@ players = {}
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
 minetest.register_on_chat_message(function(name,message)
-  if message == "happy birthday" or message == "Happy Birthday" or message == "birthday"
-  or message == "Birthday" or message == "birthday?" or message == "Birthday?" or message == "birthday!" or
-  message == "Birthday!" then
-    minetest.chat_send_all("<The All Seeing Eye> Happy Birthday to you!\nHappy Birthday to you!\nHappy Birthday dear ".. name .."!\nHappy Birthday to you!")
-  end
+     if string.match(message, "gender") or string.match(message, "sex") or string.match(message, "male") or
+     string.match(message, "female") or string.match(message, "location") or string.match(message, "u live") or
+     string.match(message, "you live") or string.match(message, "girlfriend") or string.match(message, "boyfriend") then
+          minetest.chat_send_all("<The All Seeing Eye> Maybe you shouldn't talk about that " .. name .. ".")
+     end
 end)
 
 minetest.register_on_chat_message(function(name,message)
-  if string.match(message, "gender") or string.match(message, "sex") or string.match(message, "male") or
-  string.match(message, "female") or string.match(message, "location") or string.match(message, "u live") or
-  string.match(message, "you live") or string.match(message, "girlfriend") or string.match(message, "boyfriend") then
-    minetest.chat_send_all("<The All Seeing Eye> Maybe you shouldn't talk about that " .. name .. ".")
-  end
-end)
-
-minetest.register_on_chat_message(function(name,message)
-  if minetest.setting_getbool("punctuation_control") == true then
-    if string.match(message, "%p%p%p%p%p%p") then
-      minetest.chat_send_all("<The All Seeing Eye> Please do not go over-board with punctuation.")
-    end
-  end
+     if minetest.setting_getbool("punctuation_control") == true then
+          if string.match(message, "%p%p%p%p%p%p") then
+               minetest.chat_send_all("<The All Seeing Eye> Please do not go over-board with punctuation.")
+          end
+     end
 end)
 
 -- Can be turned on and off using the time_change setting in config.lua.
 minetest.register_on_chat_message(function(name,message)
-  if minetest.setting_getbool("time_change") == true then
-    if message == "can we have day" or message == "can we have day?" or message == "Can we have day?" or message == "day?" or
-    message == "Day?" or message == "day please" or message == "please have day" then
-      minetest.set_timeofday(.4)
-      minetest.chat_send_all("<The All Seeing Eye> It is now day!")
-    elseif message == "can we have night" or message == "can we have night?" or message == "Can we have night?" or message == "night?" or
-    message == "Night?" or message == "night please" or message == "please have night" then
-      minetest.set_timeofday(0)
-      minetest.chat_send_all("<The All Seeing Eye> It is now night!")
-    end
-  end
+     if minetest.setting_getbool("time_change") == true then
+          if message == "can we have day" or message == "can we have day?" or message == "Can we have day?" or message == "day?" or
+          message == "Day?" or message == "day please" or message == "please have day" then
+               minetest.set_timeofday(.4)
+               minetest.chat_send_all("<The All Seeing Eye> It is now day!")
+          elseif message == "can we have night" or message == "can we have night?" or message == "Can we have night?" or message == "night?" or
+          message == "Night?" or message == "night please" or message == "please have night" then
+               minetest.set_timeofday(0)
+               minetest.chat_send_all("<The All Seeing Eye> It is now night!")
+          end
+     end
 end)
 
 minetest.register_on_joinplayer(function(player)
-	local name = player:get_player_name()
-   server_helper.players[name] = {shout = 0, location = 0,}
+     local name = player:get_player_name()
+     server_helper.players[name] = {shout = 0, location = 0,}
 end)
 
 -- This watches for all caps usage and warns 4 times and kicks on the 5th.
 minetest.register_on_chat_message(function(name,message)
-  if minetest.setting_getbool("cap_usage") == true then
-    if string.match(message, "%u%u%u%u") or string.match(message, "%u%u%u %u") or string.match(message, "%u %u%u%u") or
-    string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
-      local a = server_helper.players[name].shout
-		  a = a + 1
-      server_helper.players[name] = {shout = a,}
-      if a < 5 then
-        minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
-      elseif a >= 5 then
-        minetest.kick_player(name, "You were told to stop and you didn't.")
-        minetest.chat_send_all(name .. " was just kicked for not following the rules.")
-      end
-    end
-  end
-end)
-
-local you = "u"
-local b = 1
-minetest.register_on_chat_message(function(name,message)
-  if string.match(message, "help") or string.match(message, "Help") or string.match(message, "I need help.") or
-  string.match(message, "i need help") then
-    minetest.chat_send_player(name, "<The All Seeing Eye> What do you need help with?")
-      b = 1
-      minetest.register_on_chat_message(function(name,message)
-        if message == "how do i set home" or message == "How do I set home" or message == "How do I set home?" or
-        message == "how do i set home?" or message == "set home?" or message == "how to set home?" or message == "how to set home" and b == 1 then
-          minetest.chat_send_player(name, "<The All Seeing Eye> If you have the home priv, you can set home by going to the location where you would like to set home and type /sethome.")
-          b = 0
-        elseif string.match(message, "ip") or string.match(message, "ip?") or string.match(message, "IP") or string.match(message, "IP?") or
-        string.match(message, "what is my ip") or string.match(message, "what is my ip?") or string.match(message, "What is my ip?") or
-        string.match(message, "What is my IP") or string.match(message, "What is my IP?") or string.match(message, "my ip") or string.match(message, "my ip?") or
-        string.match(message, "My IP") or string.match(message, "My IP?") then
-          if b == 1 then
-            minetest.chat_send_player(name, "<The All Seeing Eye> " ..minetest.get_player_ip(name))
-            b = 0
+     if minetest.setting_getbool("cap_usage") == true then
+          if string.match(message, "%u%u%u%u") or string.match(message, "%u%u%u %u") or string.match(message, "%u %u%u%u") or
+          string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
+               local a = server_helper.players[name].shout
+		     a = a + 1
+               server_helper.players[name] = {shout = a,}
+               if a < 5 then
+                    minetest.chat_send_all("<The All Seeing Eye> Please refrain from using all caps.")
+               elseif a >= 5 then
+                    minetest.kick_player(name, "You were told to stop and you didn't.")
+                    minetest.chat_send_all(name .. " was just kicked for not following the rules.")
+               end
           end
-        elseif string.match(message, "how to protect using areas") or string.match(message, "How to protect using areas?") or string.match(message, "how do"..you.." protect using areas") or string.match(message, "how do"..you.." protect using areas?") or
-        string.match(message, "how do "..you.." use areas?") or string.match(message, "How do"..you.." use areas?") or string.match(message, "help protecting") then
-          if b == 1 then
-            minetest.chat_send_player(name, "<The All Seeing Eye> You can potect a build by typing /area_pos set and setting 2 diagonal positions on the x,y,z axis.  Then you can use /protect (area name) to finish.")
-            b = 0
-          end
-        end
-      end)
-  end
+     end
 end)
 
 -- This will ask you if you want to teleport to spawn if you are stuck.
 local respawn = 1
 minetest.register_on_chat_message(function(name,message)
-  if message == "I am stuck." or message == "I'm stuck." or message == "im stuck" or message == "Help I am stuck." or
-  message == "help i am stuck" or message == "help stuck" or message == "help im stuck" then
-    minetest.chat_send_player(name, "<The All Seeing Eye> Would you like me to teleport you to spawn?")
-      respawn = 1
-      minetest.register_on_chat_message(function(name,message)
-        if message == "no" or message == "No" and respawn == 1 then
-          minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
-          respawn = 0
-        elseif message == "yes" or message == "Yes" then
-          if respawn == 1 then
-            local pos = minetest.setting_get_pos("static_spawnpoint")
-               if pos == nil then
-                    local pos = {x=0,y=0,z=0}
-            local player = minetest.get_player_by_name(name)
-            player:setpos(pos)
-            minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
-            respawn = 0
-			end
-          end
-        end
-      end)
-    end
+     local player = server_helper.players[name].shout
+     if message == "I am stuck." or message == "I'm stuck." or message == "im stuck" or message == "Help I am stuck." or
+     message == "help i am stuck" or message == "help stuck" or message == "help im stuck" then
+          minetest.chat_send_player(name, "<The All Seeing Eye> Would you like me to teleport you to spawn?")
+          respawn = 1
+          minetest.register_on_chat_message(function(name,message)
+               if message == "no" or message == "No" then
+                    if respawn == 1 and player then
+                         minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
+                         respawn = 0
+                    end
+               elseif message == "yes" or message == "Yes" then
+                    if respawn == 1 and player then
+                         local pos = minetest.setting_get_pos("static_spawnpoint")
+                         if pos == nil then
+                              local pos = {x=0,y=0,z=0}
+                         end
+                         local player = minetest.get_player_by_name(name)
+                         player:setpos(pos)
+                         minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
+                         respawn = 0
+                    end
+               end
+          end)
+     end
 end)
 
 -- If you die in singleplayer you are given an option to teleport to your bones.
@@ -226,18 +190,6 @@ end)
 minetest.register_on_chat_message(function(name,message)
   if string.match(message, "dumb") or string.match(message, "stupid") or string.match(message, "ugly") or string.match(message, "idiot") then
     minetest.chat_send_all("<The All Seeing Eye> Shots fired!  Those are fighting words...")
-  end
-end)
-
-minetest.register_on_chat_message(function(name,message)
-  if string.match(message, "favorite color") or string.match(message, "color") or string.match(message, "colour") then
-    minetest.chat_send_all("<The All Seeing Eye> My favorite color is yellow.")
-  end
-end)
-
-minetest.register_on_chat_message(function(name,message)
-  if string.match(message, "favorite food") or string.match(message, "food") or string.match(message, "meal") then
-    minetest.chat_send_all("<The All Seeing Eye> My favorite food is Chicken.")
   end
 end)
 
