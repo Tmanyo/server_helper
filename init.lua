@@ -1,91 +1,201 @@
 server_helper = {
-players = {}
+	players = {}
 }
 
-dofile(minetest.get_modpath("server_helper").."/config.lua")
+if minetest.setting_getbool("language_control") == nil then
+	-- Set up default configuration
+	dofile(minetest.get_modpath("server_helper").."/config.lua")
+end
 
-minetest.register_on_chat_message(function(name,message)
-     if string.match(message, "gender") or string.match(message, "sex") or string.match(message, "male") or
-     string.match(message, "female") or string.match(message, "location") or string.match(message, "u live") or
-     string.match(message, "you live") or string.match(message, "girlfriend") or string.match(message, "boyfriend") then
-          minetest.chat_send_player(name, "<The All Seeing Eye> Maybe you shouldn't talk about that " .. name .. ".")
-     end
+server_helper.callbacks = {
+	--[[
+	{	-- Each of these keys in the table can be nil when not used (except keywords)
+		keywords  = {"word1", "word2", ...},
+		answer    = {[send to everybody?], "Answer to player @1."},
+		setting   = "foo_enabled",
+		use_string_match = true,
+		-- ^ Uses string.match to compare
+		compare_full_text = true,
+		-- ^ Compares with the whole message
+		--   overrides 'use_string_match'
+		callback  = function(name)
+			do_something()
+			...
+			return [send to everybody?], "Return text"
+		end
+		-- ^ Gets called when one of the keywords matches
+		--   Overrides 'answer'
+	},
+	]]
+	{
+		keywords = {"gender", "sex", "male", "female", "location", "u live", "you live", "girlfriend", "boyfriend"},
+		answer   = {false, "Maybe you shouldn't talk about that @1."}
+	},
+	{
+		keywords = {"%p%p%p%p%p%p"},
+		answer   = {false, "Please do not go over-board with punctuation."},
+		setting  = "punctuation_control"
+	},
+	{
+		-- Can be turned on and off using the time_change setting in config.lua.
+		keywords = {"can we have day", "day please", "please have day"},
+		setting  = "time_change",
+		callback = function(name)
+			minetest.set_timeofday(.3)
+			return true, "It is now day!"
+		end
+	},
+	{
+		keywords = {"can we have night", "night please", "please have night"},
+		setting  = "time_change",
+		callback = function(name)
+			minetest.set_timeofday(0)
+			return true, "It is now night!"
+		end
+	},
+	{
+		keywords = {"i am stuck", "i'm stuck", "im stuck", "help stuck"},
+		callback = function(name)
+			server_helper.players[name].respawn = 1
+			return false, "Would you like me to teleport you to spawn?"
+		end
+	},
+	{
+		keywords = {"hi", "hello", "hola", "howdy"},
+		answer   = {true, "Hello @1."},
+		compare_full_text = true
+	},
+	-- These watch for certain keywords or phrases and make a response.
+	{
+		keywords = {"the all seeing eye"},
+		answer   = {true, "What do you need?"},
+		compare_full_text = true
+	},
+	{
+		keywords = {"grief"},
+		answer   = {false, "Griefing is not permitted and will not be allowed!"},
+		use_string_match = true,
+	},
+	{
+		keywords = {"fuck", "shit", "bitch", "cunt", "dick"},
+		setting  = "language_control",
+		callback = function(name)
+			local player = server_helper.players[name]
+			player.shout = player.shout + 2
+			if player.shout <= 6 then
+				return true, "Please do not use foul language."
+			end
+			minetest.kick_player(name, "You didn't stop using foul language!")
+			minetest.chat_send_all(name .. " was just kicked for not following the rules.")
+		end
+	},
+	{
+		keywords = {"cussing", "cursing", "bad word", "swearing"},
+		answer   = {false, "Bad language is not acceptable."},
+		setting  = "language_control",
+	},
+	{
+		keywords  = {"who is the all seeing eye"},
+		answer    = {true, "I am a server moderator created by Tmanyo."}
+	},
+	{
+		keywords  = {"can i be mod", "can i be admin", "can i be a mod", "can i be an admin", "can i have more privs"},
+		answer    = {true, "You need to ask server administration."}
+	},
+	{
+		keywords  = {"dumb", "stupid", "ugly", "idiot"},
+		answer    = {true, "Shots fired!  Those are fighting words..."}
+	}
+}
+
+minetest.register_on_chat_message(function(name, message)
+	message = message:lower()
+	for i, info in pairs(server_helper.callbacks) do
+		if not info.setting
+				or minetest.setting_getbool(info.setting) == true then
+			local matches
+			for j, keyword in pairs(info.keywords) do
+				if info.compare_full_text then
+					matches = keyword == message
+				elseif info.use_string_match then
+					matches = message:match(keyword)
+				else
+					matches = message:find(keyword)
+				end
+				if matches then break end
+			end
+			local broadcast, message
+			if matches and info.callback then
+				broadcast, message = info.callback(name)
+			elseif matches and info.answer then
+				broadcast = info.answer[1]
+				message   = info.answer[2]
+			end
+			-- Message stays 'nil' when no keyword matched
+			if message then
+				message = message:gsub("@1", name)
+				if broadcast then
+					minetest.chat_send_all("<The All Seeing Eye> " .. message)
+				else
+					minetest.chat_send_player(name, "<The All Seeing Eye> " .. message)
+				end
+			end
+			if matches then
+				break -- Already answered to the current message
+			end
+		end
+	end
 end)
 
-minetest.register_on_chat_message(function(name,message)
-     if minetest.setting_getbool("punctuation_control") == true then
-          if string.match(message, "%p%p%p%p%p%p") then
-               minetest.chat_send_player(name, "<The All Seeing Eye> Please do not go over-board with punctuation.")
-          end
-     end
-end)
+minetest.register_on_chat_message(function(name, message)
+	if minetest.setting_getbool("cap_usage") ~= true then
+		return
+	end
 
--- Can be turned on and off using the time_change setting in config.lua.
-minetest.register_on_chat_message(function(name,message)
-     if minetest.setting_getbool("time_change") == true then
-          if message == "can we have day" or message == "can we have day?" or message == "Can we have day?" or message == "day?" or
-          message == "Day?" or message == "day please" or message == "please have day" then
-               minetest.set_timeofday(.4)
-               minetest.chat_send_all("<The All Seeing Eye> It is now day!")
-          elseif message == "can we have night" or message == "can we have night?" or message == "Can we have night?" or message == "night?" or
-          message == "Night?" or message == "night please" or message == "please have night" then
-               minetest.set_timeofday(0)
-               minetest.chat_send_all("<The All Seeing Eye> It is now night!")
-          end
-     end
+	if message:match("%u%u%u%u")
+			or message:match("%u%u%u %u")
+			or message:match("%u %u%u%u")
+			or message:match("u%l%u%l%u") then
+
+		local player = server_helper.players[name]
+		player.shout = player.shout + 1
+
+		if player.shout < 5 then
+			minetest.chat_send_player(name, "<The All Seeing Eye> Please refrain from using all caps.")
+			return
+		end
+		minetest.kick_player(name, "You were told to stop and you didn't.")
+		minetest.chat_send_all(name .. " was just kicked for not following the rules.")
+	end
 end)
 
 minetest.register_on_joinplayer(function(player)
-     local name = player:get_player_name()
-     server_helper.players[name] = {shout = 0, location = 0,}
-end)
-
--- This watches for all caps usage and warns 4 times and kicks on the 5th.
-minetest.register_on_chat_message(function(name,message)
-     if minetest.setting_getbool("cap_usage") == true then
-          if string.match(message, "%u%u%u%u") or string.match(message, "%u%u%u %u") or string.match(message, "%u %u%u%u") or
-          string.match(message, "%u %u%u %u") or string.match(message, "%u%l%u%l%u") then
-               local a = server_helper.players[name].shout
-		     a = a + 1
-               server_helper.players[name] = {shout = a,}
-               if a < 5 then
-                    minetest.chat_send_player(name, "<The All Seeing Eye> Please refrain from using all caps.")
-               elseif a >= 5 then
-                    minetest.kick_player(name, "You were told to stop and you didn't.")
-                    minetest.chat_send_all(name .. " was just kicked for not following the rules.")
-               end
-          end
-     end
+	local name = player:get_player_name()
+	server_helper.players[name] = {
+		shout = 0,
+		location = 0,
+		respawn = 0
+	}
 end)
 
 -- This will ask you if you want to teleport to spawn if you are stuck.
-local respawn = 1
-minetest.register_on_chat_message(function(name,message)
-     local player = server_helper.players[name]
-     if message == "I am stuck." or message == "I'm stuck." or message == "im stuck" or message == "Help I am stuck." or
-     message == "help i am stuck" or message == "help stuck" or message == "help im stuck" then
-          minetest.chat_send_player(name, "<The All Seeing Eye> Would you like me to teleport you to spawn?")
-          respawn = 1
-          minetest.register_on_chat_message(function(name,message)
-               if message == "no" or message == "No" then
-                    if respawn == 1 and player then
-                         minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
-                         respawn = 0
-                    end
-               elseif message == "yes" or message == "Yes" then
-                    if respawn == 1 and player then
-                         local pos = minetest.setting_get_pos("static_spawnpoint")
-                         if pos == nil then
-                              local pos = {x=0,y=0,z=0}
-                         end
-                         local player = minetest.get_player_by_name(name)
-                         player:setpos(pos)
-                         minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
-                         respawn = 0
-                    end
-               end
-          end)
-     end
+minetest.register_on_chat_message(function(name, message)
+	local player = server_helper.players[name]
+	if not player or player.respawn ~= 1 then
+		return
+	end
+
+	message = message:lower()
+	if message == "no" then
+		minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
+		player.respawn = 0
+	elseif message == "yes" then
+		local pos = minetest.setting_get_pos("static_spawnpoint") or {x=0,y=0,z=0}
+		local player = minetest.get_player_by_name(name)
+		player:setpos(pos)
+		minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
+		player.respawn = 0
+	end
 end)
 
 -- If you die in singleplayer you are given an option to teleport to your bones.
@@ -118,79 +228,6 @@ minetest.register_on_dieplayer(function(player)
       else
       end
     end)
-end)
-
-minetest.register_on_chat_message(function(name,message)
-     if message == "Hi" or message == "hi" or message == "hello" or message == "Hello" or
-     message == "Hola" or message == "hola" or message == "howdy" or message == "Howdy" or
-     message == "Hoy" or message == "hoy" then
-          minetest.chat_send_all("<The All Seeing Eye> Hello "..name..".")
-     end
-end)
-
-local myname = "The All Seeing Eye"
-local myname2 = "the all seeing eye"
-minetest.register_on_chat_message(function(name,message)
-     if string.match(message, myname) then
-          minetest.chat_send_all("<The All Seeing Eye> What do you need?")
-     end
-     if string.match(message, myname2) then
-          minetest.chat_send_all("<The All Seeing Eye> What do you need?")
-     end
-end)
-
--- These watch for certain keywords or phrases and make a response.
-minetest.register_on_chat_message(function(name,message)
-     if string.match(message, "grief" or "griefing" or "griefed") then
-          minetest.chat_send_all("<The All Seeing Eye> Griefing is not permitted and will not be allowed!")
-     end
-end)
-
-minetest.register_on_chat_message(function(name, message)
-     if minetest.setting_getbool("language_control") == true then
-          if string.match(message, "fuck") or string.match(message, "Fuck") or string.match(message, "Shit") or
-          string.match(message, "shit") or string.match(message, "ass") or string.match(message, "Ass") or
-          string.match(message, "bitch") or string.match(message, "Bitch") or string.match(message, "Cunt") or
-          string.match(message, "cunt") or string.match(message, "Dick") or string.match(message, "dick") or
-          string.match(message, "Fucker") or string.match(message, "fucker") or string.match(message, "damn") or
-          string.match(message, "Damn") then
-               local a = server_helper.players[name].shout
-               a = a + 1
-               server_helper.players[name] = {shout = a,}
-               if a < 5 then
-                    minetest.chat_send_player(name, "<The All Seeing Eye> Please do not use foul language.")
-               elseif a >= 5 then
-                    minetest.kick_player(name, "You didn't stop using foul language!")
-                    minetest.chat_send_all(name .. " was just kicked for not following the rules.")
-               end
-          end
-     end
-end)
-
-minetest.register_on_chat_message(function(name,message)
-     if string.match(message, "cussing") or string.match(message, "cursing") or string.match(message, "bad word") or string.match(message, "swearing") then
-          if minetest.setting_getbool("language_control") == true then
-               minetest.chat_send_all("<The All Seeing Eye> Bad language is not acceptable.")
-          end
-     end
-end)
-
-minetest.register_on_chat_message(function(name,message)
-     if message == "who is The All Seeing Eye" or message == "who is the all seeing eye" or message == "The All Seeing Eye?" or message == "who is The All Seeing Eye?" or message == "who is the all seeing eye?" or message == "Who is the all seeing eye?" or message == "Who is The All Seeing Eye?" then
-          minetest.chat_send_all("<The All Seeing Eye> I am a server moderator created by Tmanyo.")
-     end
-end)
-
-minetest.register_on_chat_message(function(name,message)
-     if message == "can i be a mod" or message == "can i be a mod?" or message == "Can I be a mod?" or message == "can i be an admin" or message == "can i be an admin?" or message == "Can I be an admin?" or message == "can i have more privs" then
-          minetest.chat_send_player(name, "<The All Seeing Eye> You need to ask server administration.")
-     end
-end)
-
-minetest.register_on_chat_message(function(name,message)
-     if string.match(message, "dumb") or string.match(message, "stupid") or string.match(message, "ugly") or string.match(message, "idiot") then
-          minetest.chat_send_all("<The All Seeing Eye> Shots fired!  Those are fighting words...")
-     end
 end)
 
 minetest.register_chatcommand("people", {
