@@ -1,5 +1,9 @@
 # server_helper
-This helps server administrators and moderators on Minetest to keep the peace.
-This mod is an in-game "bot" that watches for certain keywords in chat or for certain actions in the world and triggers phrases 
-based off of what was done.  This mod can be used as a server moderator, an automated staff member.  It can be very helpful in day
-to day gameplay and keeping the peace.
+This mod acts as an automated server staff member.
+Common uses include:
+1. Language control
+2. Punctuation control
+3. Caps control
+4. Easy time change ability for players (setting permitting)
+--------------------------
+All four common uses mentioned have settings that can be set to false (default is true) depending on the rules.
