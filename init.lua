@@ -60,26 +60,30 @@ end)
 
 -- This will ask you if you want to teleport to spawn if you are stuck.
 minetest.register_on_chat_message(function(name,message)
+     local player = minetest.get_player_by_name(name)
      if message == "I am stuck." or message == "I'm stuck." or message == "im stuck" or message == "Help I am stuck." or
      message == "help i am stuck" or message == "help stuck" or message == "help im stuck" then
           minetest.chat_send_player(name, "<The All Seeing Eye> Would you like me to teleport you to spawn?")
           local respawn = server_helper.players[name].shout
           respawn = 1
           server_helper.players[name] = {shout = respawn,}
-          local player_a = name
-          minetest.register_on_chat_message(function(player_a,message)
-               if message == "no" or message == "No" then
-                    minetest.chat_send_player(player_a, "<The All Seeing Eye> Ok.")
-                    respawn = 0
-               elseif message == "yes" or message == "Yes" then
-                    local pos = minetest.setting_get_pos("static_spawnpoint")
-                    if pos == nil then
-                         local pos = {x=0,y=0,z=0}
+          minetest.register_on_chat_message(function(name,message)
+               if not player then
+                    return false
+               elseif player then
+                    if message == "no" or message == "No" then
+                         minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
+                         respawn = 0
+                    elseif message == "yes" or message == "Yes" then
+                         local pos = minetest.setting_get_pos("static_spawnpoint")
+                         if pos == nil then
+                              local pos = {x=0,y=0,z=0}
+                         end
+                         local player = minetest.get_player_by_name(name)
+                         player:setpos(pos)
+                         minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
+                         respawn = 0
                     end
-                    local player = minetest.get_player_by_name(name)
-                    player:setpos(pos)
-                    minetest.chat_send_player(player_a, "<The All Seeing Eye> There you are!")
-                    respawn = 0
                end
           end)
      end
