@@ -66,9 +66,10 @@ minetest.register_on_chat_message(function(name,message)
           local respawn = server_helper.players[name].shout
           respawn = 1
           server_helper.players[name] = {shout = respawn,}
-          minetest.register_on_chat_message(function(respawn,message)
+          local player_a = name
+          minetest.register_on_chat_message(function(player_a,message)
                if message == "no" or message == "No" then
-                    minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
+                    minetest.chat_send_player(player_a, "<The All Seeing Eye> Ok.")
                     respawn = 0
                elseif message == "yes" or message == "Yes" then
                     local pos = minetest.setting_get_pos("static_spawnpoint")
@@ -77,7 +78,7 @@ minetest.register_on_chat_message(function(name,message)
                     end
                     local player = minetest.get_player_by_name(name)
                     player:setpos(pos)
-                    minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
+                    minetest.chat_send_player(player_a, "<The All Seeing Eye> There you are!")
                     respawn = 0
                end
           end)
