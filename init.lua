@@ -66,8 +66,8 @@ minetest.register_on_chat_message(function(name,message)
           local respawn = server_helper.players[name].shout
           respawn = 1
           server_helper.players[name] = {shout = respawn,}
-          minetest.register_on_chat_message(function(player,message)
-               if respawn then
+          if respawn then
+               minetest.register_on_chat_message(function(name,message)
                     if message == "no" or message == "No" then
                          minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
                          respawn = 0
@@ -81,8 +81,8 @@ minetest.register_on_chat_message(function(name,message)
                          minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
                          respawn = 0
                     end
-               end
-          end)
+               end)
+          end
      end
 end)
 
