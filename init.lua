@@ -66,7 +66,7 @@ minetest.register_on_chat_message(function(name,message)
           minetest.chat_send_player(name, "<The All Seeing Eye> Would you like me to teleport you to spawn?")
           respawn = 1
           local player = name
-          minetest.register_on_chat_message(function(name,message)
+          minetest.register_on_chat_message(function(player,message)
                if message == "no" or message == "No" then
                     if respawn == 1 and player then
                          minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
