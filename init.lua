@@ -4,9 +4,6 @@ players = {}
 
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
-minetest.setting_set("no_messages", "false")
-minetest.setting_set("rank 1", "true")
-
 minetest.register_on_chat_message(function(name,message)
      if string.match(message, "gender") or string.match(message, "sex") or string.match(message, "male") or
      string.match(message, "female") or string.match(message, "location") or string.match(message, "u live") or
@@ -176,7 +173,9 @@ minetest.register_on_chat_message(function(name, message)
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if minetest.setting_getbool("no_messages") == false then
+     if priv.no_server_helper then
+          return false
+     else
           if string.match(message, "cussing") or string.match(message, "cursing") or string.match(message, "bad word") or string.match(message, "swearing") then
                if minetest.setting_getbool("language_control") == true then
                     minetest.chat_send_player(name, "<The All Seeing Eye> Bad language is not acceptable.")
@@ -186,7 +185,9 @@ minetest.register_on_chat_message(function(name,message)
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if minetest.setting_getbool("no_messages") == false then
+     if priv.no_server_helper then
+          return false
+     else
           if message == "who is The All Seeing Eye" or message == "who is the all seeing eye" or message == "The All Seeing Eye?" or message == "who is The All Seeing Eye?" or message == "who is the all seeing eye?" or message == "Who is the all seeing eye?" or message == "Who is The All Seeing Eye?" then
                minetest.chat_send_player(name, "<The All Seeing Eye> I am a server moderator created by Tmanyo.")
           end
@@ -194,7 +195,9 @@ minetest.register_on_chat_message(function(name,message)
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if minetest.setting_getbool("no_messages") == false then
+     if priv.no_server_helper then
+          return false
+     else
           if message == "can i be a mod" or message == "can i be a mod?" or message == "Can I be a mod?" or message == "can i be an admin" or message == "can i be an admin?" or message == "Can I be an admin?" or message == "can i have more privs" then
                minetest.chat_send_player(name, "<The All Seeing Eye> You need to ask server administration.")
           end
@@ -202,7 +205,9 @@ minetest.register_on_chat_message(function(name,message)
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if minetest.setting_getbool("no_messages") == false and minetest.setting_getbool("rank 1") == true then
+     if priv.no_server_helper then
+          return false
+     else
           if string.match(message, "dumb") or string.match(message, "stupid") or string.match(message, "ugly") or string.match(message, "idiot") then
                minetest.chat_send_player(name, "<The All Seeing Eye> Shots fired!  Those are fighting words...")
           end
@@ -232,28 +237,3 @@ minetest.register_privilege("no_server_helper", {
      description = "Allow trust worthy players option to not listen to server helper.",
      give_to_singleplayer = false,
 })
-
-minetest.register_chatcommand("options", {
-     privs = {
-          no_server_helper = true
-     },
-     func = function(name, param)
-          minetest.show_formspec(name, "server_helper:options",
-               "size[4,4]" ..
-               "field[.5,1;3,1;question;The All Seeing Eye messages?(Y/N); ]" ..
-               "button_exit[1,3;2,1;exit;Apply]")
-          player = minetest.get_player_by_name(name)
-     end
-})
-
-minetest.register_on_player_receive_fields(function(player, formname, fields)
-     if formname == "server_helper:options" then
-          local player = player:get_player_name()
-          if fields.question == "y" or fields.question == "Y" then
-               minetest.setting_set("no_messages", "false")
-          elseif fields.question == "n" or fields.question == "N" then
-               minetest.setting_set("no_messages", "true")
-               minetest.setting_set("rank 2", "true")
-          end
-     end
-end)
