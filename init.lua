@@ -248,9 +248,9 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
      if formname == "server_helper:options" then
           local player = player:get_player_name()
           if fields.question == "y" or fields.question == "Y" then
-               minetest.setting_set("no_messages", "false")
+               player:get_player_name() = minetest.setting_set("no_messages", "false")
           elseif fields.question == "n" or fields.question == "N" then
-               minetest.setting_set("no_messages", "true")
+               player:get_player_name() = minetest.setting_set("no_messages", "true")
           end
      end
 end)
