@@ -4,6 +4,8 @@ players = {}
 
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
+minetest.setting_set("no_messages", "false")
+
 minetest.register_on_chat_message(function(name,message)
      if string.match(message, "gender") or string.match(message, "sex") or string.match(message, "male") or
      string.match(message, "female") or string.match(message, "location") or string.match(message, "u live") or
@@ -94,33 +96,35 @@ end)
 
 -- If you die in singleplayer you are given an option to teleport to your bones.
 minetest.register_on_dieplayer(function(player)
-     local name = player:get_player_name()
-     local dead_name = player:get_player_name()
-     local pos = vector.round(player:getpos())
-     local question = 0
-     server_helper.players[name].location = pos,
-     minetest.chat_send_player(player:get_player_name(),"<The All Seeing Eye> Would you like me to teleport you to your bones? (Yes/No)")
-     question = 1
-     print (name)
-     print (dead_name)
-     minetest.register_on_chat_message(function(name,message)
+     if minetest.setting_getbool("bones_teleport") == true then
+          local name = player:get_player_name()
+          local dead_name = player:get_player_name()
+          local pos = vector.round(player:getpos())
+          local question = 0
+          server_helper.players[name].location = pos,
+          minetest.chat_send_player(player:get_player_name(),"<The All Seeing Eye> Would you like me to teleport you to your bones? (Yes/No)")
+          question = 1
           print (name)
           print (dead_name)
-          if message == "no"  or message == "No" then
-               if question == 1 and dead_name == name then
-                    minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
-                    question = 0
+          minetest.register_on_chat_message(function(name,message)
+               print (name)
+               print (dead_name)
+               if message == "no"  or message == "No" then
+                    if question == 1 and dead_name == name then
+                         minetest.chat_send_player(name, "<The All Seeing Eye> Ok.")
+                         question = 0
+                    end
+               elseif message == "yes" or message == "Yes" then
+                    if question == 1 and dead_name == name  then
+                         local playername = player:get_player_name(player)
+                         local pos = server_helper.players[name].location
+                         player:setpos(pos)
+                         minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
+                         question = 0
+                    end
                end
-          elseif message == "yes" or message == "Yes" then
-               if question == 1 and dead_name == name  then
-                    local playername = player:get_player_name(player)
-                    local pos = server_helper.players[name].location
-                    player:setpos(pos)
-                    minetest.chat_send_player(name, "<The All Seeing Eye> There you are!")
-                    question = 0
-               end
-          end
-     end)
+          end)
+     end
 end)
 
 minetest.register_on_chat_message(function(name,message)
@@ -171,28 +175,36 @@ minetest.register_on_chat_message(function(name, message)
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if string.match(message, "cussing") or string.match(message, "cursing") or string.match(message, "bad word") or string.match(message, "swearing") then
-          if minetest.setting_getbool("language_control") == true then
-               minetest.chat_send_player(name, "<The All Seeing Eye> Bad language is not acceptable.")
+     if minetest.setting_getbool("no_messages") == false then
+          if string.match(message, "cussing") or string.match(message, "cursing") or string.match(message, "bad word") or string.match(message, "swearing") then
+               if minetest.setting_getbool("language_control") == true then
+                    minetest.chat_send_player(name, "<The All Seeing Eye> Bad language is not acceptable.")
+               end
           end
      end
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if message == "who is The All Seeing Eye" or message == "who is the all seeing eye" or message == "The All Seeing Eye?" or message == "who is The All Seeing Eye?" or message == "who is the all seeing eye?" or message == "Who is the all seeing eye?" or message == "Who is The All Seeing Eye?" then
-          minetest.chat_send_player(name, "<The All Seeing Eye> I am a server moderator created by Tmanyo.")
+     if minetest.setting_getbool("no_messages") == false then
+          if message == "who is The All Seeing Eye" or message == "who is the all seeing eye" or message == "The All Seeing Eye?" or message == "who is The All Seeing Eye?" or message == "who is the all seeing eye?" or message == "Who is the all seeing eye?" or message == "Who is The All Seeing Eye?" then
+               minetest.chat_send_player(name, "<The All Seeing Eye> I am a server moderator created by Tmanyo.")
+          end
      end
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if message == "can i be a mod" or message == "can i be a mod?" or message == "Can I be a mod?" or message == "can i be an admin" or message == "can i be an admin?" or message == "Can I be an admin?" or message == "can i have more privs" then
-          minetest.chat_send_player(name, "<The All Seeing Eye> You need to ask server administration.")
+     if minetest.setting_getbool("no_messages") == false then
+          if message == "can i be a mod" or message == "can i be a mod?" or message == "Can I be a mod?" or message == "can i be an admin" or message == "can i be an admin?" or message == "Can I be an admin?" or message == "can i have more privs" then
+               minetest.chat_send_player(name, "<The All Seeing Eye> You need to ask server administration.")
+          end
      end
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if string.match(message, "dumb") or string.match(message, "stupid") or string.match(message, "ugly") or string.match(message, "idiot") then
-          minetest.chat_send_player(name, "<The All Seeing Eye> Shots fired!  Those are fighting words...")
+     if minetest.setting_getbool("no_messages") == false then
+          if string.match(message, "dumb") or string.match(message, "stupid") or string.match(message, "ugly") or string.match(message, "idiot") then
+               minetest.chat_send_player(name, "<The All Seeing Eye> Shots fired!  Those are fighting words...")
+          end
      end
 end)
 
@@ -214,3 +226,31 @@ minetest.register_chatcommand("people", {
 			"button_exit[.5,6.5;2,1;exit;Close]")
   end
 })
+
+minetest.register_privilege("no_server_helper", {
+     description = "Allow trust worthy players option to not listen to server helper.",
+     give_to_singleplayer = false,
+})
+
+minetest.register_chatcommand("options", {
+     privs = {
+          no_server_helper = true
+     },
+     func = function(name, param)
+          minetest.show_formspec(name, "server_helper:options",
+               "size[4,4]" ..
+               "field[.5,1;3,1;question;The All Seeing Eye messages?(Y/N); ]" ..
+               "button_exit[1,3;2,1;exit;Apply]")
+     end
+})
+
+minetest.register_on_player_receive_fields(function(player, formname, fields)
+     if formname == "server_helper:options" then
+          local player = player:get_player_name()
+          if fields.question == "y" or fields.question == "Y" then
+               minetest.setting_set("no_messages", "false")
+          elseif fields.question == "n" or fields.question == "N" then
+               minetest.setting_set("no_messages", "true")
+          end
+     end
+end)
