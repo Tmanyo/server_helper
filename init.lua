@@ -5,6 +5,7 @@ players = {}
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
 minetest.setting_set("no_messages", "false")
+minetest.setting_set("rank 1", "true")
 
 minetest.register_on_chat_message(function(name,message)
      if string.match(message, "gender") or string.match(message, "sex") or string.match(message, "male") or
@@ -201,7 +202,7 @@ minetest.register_on_chat_message(function(name,message)
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if minetest.setting_getbool("no_messages") == false then
+     if minetest.setting_getbool("no_messages") == false and minetest.setting_getbool("rank 1") == true then
           if string.match(message, "dumb") or string.match(message, "stupid") or string.match(message, "ugly") or string.match(message, "idiot") then
                minetest.chat_send_player(name, "<The All Seeing Eye> Shots fired!  Those are fighting words...")
           end
@@ -241,6 +242,7 @@ minetest.register_chatcommand("options", {
                "size[4,4]" ..
                "field[.5,1;3,1;question;The All Seeing Eye messages?(Y/N); ]" ..
                "button_exit[1,3;2,1;exit;Apply]")
+          player = minetest.get_player_by_name(name)
      end
 })
 
@@ -248,9 +250,10 @@ minetest.register_on_player_receive_fields(function(player, formname, fields)
      if formname == "server_helper:options" then
           local player = player:get_player_name()
           if fields.question == "y" or fields.question == "Y" then
-               player:get_player_name() = minetest.setting_set("no_messages", "false")
+               minetest.setting_set("no_messages", "false")
           elseif fields.question == "n" or fields.question == "N" then
-               player:get_player_name() = minetest.setting_set("no_messages", "true")
+               minetest.setting_set("no_messages", "true")
+               minetest.setting_set("rank 2", "true")
           end
      end
 end)
