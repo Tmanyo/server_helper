@@ -4,6 +4,15 @@ players = {}
 
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
+function check_privs(name)
+     minetest.get_player_privs(name)
+     if no_server_helper == true then
+          return false
+     else
+          return true
+     end
+end
+
 minetest.register_on_chat_message(function(name,message)
      if string.match(message, "gender") or string.match(message, "sex") or string.match(message, "male") or
      string.match(message, "female") or string.match(message, "location") or string.match(message, "u live") or
@@ -173,44 +182,32 @@ minetest.register_on_chat_message(function(name, message)
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if priv.no_server_helper then
-          return false
-     else
-          if string.match(message, "cussing") or string.match(message, "cursing") or string.match(message, "bad word") or string.match(message, "swearing") then
-               if minetest.setting_getbool("language_control") == true then
-                    minetest.chat_send_player(name, "<The All Seeing Eye> Bad language is not acceptable.")
-               end
+     check_privs()
+     if string.match(message, "cussing") or string.match(message, "cursing") or string.match(message, "bad word") or string.match(message, "swearing") then
+          if minetest.setting_getbool("language_control") == true then
+               minetest.chat_send_player(name, "<The All Seeing Eye> Bad language is not acceptable.")
           end
      end
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if priv.no_server_helper then
-          return false
-     else
-          if message == "who is The All Seeing Eye" or message == "who is the all seeing eye" or message == "The All Seeing Eye?" or message == "who is The All Seeing Eye?" or message == "who is the all seeing eye?" or message == "Who is the all seeing eye?" or message == "Who is The All Seeing Eye?" then
-               minetest.chat_send_player(name, "<The All Seeing Eye> I am a server moderator created by Tmanyo.")
-          end
+     check_privs()
+     if message == "who is The All Seeing Eye" or message == "who is the all seeing eye" or message == "The All Seeing Eye?" or message == "who is The All Seeing Eye?" or message == "who is the all seeing eye?" or message == "Who is the all seeing eye?" or message == "Who is The All Seeing Eye?" then
+          minetest.chat_send_player(name, "<The All Seeing Eye> I am a server moderator created by Tmanyo.")
      end
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if priv.no_server_helper then
-          return false
-     else
-          if message == "can i be a mod" or message == "can i be a mod?" or message == "Can I be a mod?" or message == "can i be an admin" or message == "can i be an admin?" or message == "Can I be an admin?" or message == "can i have more privs" then
-               minetest.chat_send_player(name, "<The All Seeing Eye> You need to ask server administration.")
-          end
+     check_privs()
+     if message == "can i be a mod" or message == "can i be a mod?" or message == "Can I be a mod?" or message == "can i be an admin" or message == "can i be an admin?" or message == "Can I be an admin?" or message == "can i have more privs" then
+          minetest.chat_send_player(name, "<The All Seeing Eye> You need to ask server administration.")
      end
 end)
 
 minetest.register_on_chat_message(function(name,message)
-     if priv.no_server_helper then
-          return false
-     else
-          if string.match(message, "dumb") or string.match(message, "stupid") or string.match(message, "ugly") or string.match(message, "idiot") then
-               minetest.chat_send_player(name, "<The All Seeing Eye> Shots fired!  Those are fighting words...")
-          end
+     check_privs()
+     if string.match(message, "dumb") or string.match(message, "stupid") or string.match(message, "ugly") or string.match(message, "idiot") then
+          minetest.chat_send_player(name, "<The All Seeing Eye> Shots fired!  Those are fighting words...")
      end
 end)
 
