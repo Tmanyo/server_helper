@@ -104,7 +104,7 @@ end)
 
 -- If you die in singleplayer you are given an option to teleport to your bones.
 minetest.register_on_dieplayer(function(player)
-     if not minetest.check_player_privs(name, {no_server_helper=true}) then
+     if not minetest.check_player_privs(player:get_player_name(), {no_server_helper=true}) then
           if minetest.setting_getbool("bones_teleport") == true then
                local name = player:get_player_name()
                local dead_name = player:get_player_name()
