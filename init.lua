@@ -6,7 +6,7 @@ dofile(minetest.get_modpath("server_helper").."/config.lua")
 
 bad_words = {
      "gender", "sex", "male", "female", "location", "u live", "you live", "girlfriend", "boyfriend", "family",
-     "how old", "old", "age"
+     "old", "age"
 }
 
 minetest.register_on_chat_message(function(name,message)
