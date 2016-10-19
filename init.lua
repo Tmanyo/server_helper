@@ -4,13 +4,17 @@ players = {}
 
 dofile(minetest.get_modpath("server_helper").."/config.lua")
 
+bad_words = {
+     "gender", "sex", "male", "female", "location", "u live", "you live", "girlfriend", "boyfriend", "family",
+     "how old", "old", "age"
+}
+
 minetest.register_on_chat_message(function(name,message)
      if not minetest.check_player_privs(name, {no_server_helper=true}) then
-          if string.match(message, "gender") or string.match(message, "sex") or string.match(message, "male") or
-          string.match(message, "female") or string.match(message, "location") or string.match(message, "u live") or
-          string.match(message, "you live") or string.match(message, "girlfriend") or string.match(message, "boyfriend") or
-          string.match(message, "family") or string.match(message, "how old") or string.match(message, "old?")  then
-               minetest.chat_send_player(name, "<The All Seeing Eye> Maybe you shouldn't talk about that " .. name .. ".")
+          for k, v in pairs(bad_words) do
+               if v == string.match(message, v) then
+                    minetest.chat_send_player(name, "<The All Seeing Eye> Maybe you shouldn't talk about that " .. name .. ".")
+               end
           end
      end
 end)
