@@ -6,3 +6,5 @@ minetest.setting_set("cap_usage", "true")
 minetest.setting_set("time_change", "true")
 -- Toggle over-use of punctuation, default is true.
 minetest.setting_set("punctuation_control", "true")
+-- Toggle allowing teleport to bones, default is true.
+minetest.setting_set("bones_teleport", "true")
